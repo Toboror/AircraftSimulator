@@ -1,7 +1,7 @@
 import random
 import main
 import time
-import aircraft
+from main import aircraftList
 
 chosenCraft = main.chosenCraft
 
@@ -35,9 +35,10 @@ def stateOfTheCraft():
           '\nCondition: ' + str(chosenCraft.rightEngine.engineCondition) + '%',
           '\nHorsepower: ' + str(chosenCraft.rightEngine.engineHP),
           '\nFuel consumption rate: ' + str(chosenCraft.rightEngine.calculateFuelBurnRate()) + ' litres per hour'
-                                                                                               '\n'
-                                                                                               '\nTotal fuel consumption rate: ' + str(
-              chosenCraft.totalFuelBurnRate()) + ' litres per hour',
+          '\n'
+          '\nTotal fuel amount: ' + str(chosenCraft.leftEngine.engineFuel + chosenCraft.rightEngine.engineFuel) +
+          ' litres',
+          '\nTotal fuel consumption rate: ' + str(chosenCraft.totalFuelBurnRate()) + ' litres per hour',
           '\nTotal engine condition: ' + str(chosenCraft.totalCondition()) + '%')
 
 
@@ -48,7 +49,6 @@ def takeOff():
     global rightEngineOn
     print('Checking if everything works...')
     time.sleep(1)
-    checkEngine()
     if leftEngineWorks and rightEngineWorks:
         print('Alright, taking off!')
         hasTakenOff = True
@@ -74,38 +74,52 @@ def takeOff():
 def chooseAircraft():
     global chosenCraft
     print('Which aircraft would you like?'
-          '\n1. Spitfire'
-          '\n2. Exit')
+          '\n1. ' + str(aircraftList[0].name),
+          '\n2. ' + str(aircraftList[1].name),
+          '\n3. ' + str(aircraftList[2].name),
+          '\n4. Exit')
     userInput = input()
     if userInput == '1':
-        chosenCraft = main.spitfire
+        chosenCraft = aircraftList[0]
+        print('Your chosen aircraft is ' + str(aircraftList[0].name))
+    elif userInput == '2':
+        chosenCraft = aircraftList[1]
+        print('Your chosen aircraft is ' + str(aircraftList[1].name))
+    elif userInput == '3':
+        chosenCraft = aircraftList[2]
+        print('Your chosen aircraft is ' + str(aircraftList[2].name))
     else:
         exit()
 
 
-secondRound = False
+isOnSecondRound = False
+
+
+def secondRound():
+        print('\nWhat do you want to do?'
+              '\n1. Continue flying'
+              '\n2. Check aircraft'
+              '\n3. Exit')
+        userInput = input()
+        if userInput == '1':
+            flying()
+        elif userInput == '2':
+            stateOfTheCraft()
+        elif userInput == '3':
+            exit()
 
 
 # Function asking the user what to do next.
 def whatToDo():
-    global secondRound
+    global isOnSecondRound
     if hasTakenOff:
-        if secondRound and checkEngine():
-            print('\nWhat do you want to do?'
-                  '\n1. Continue flying'
-                  '\n2. Check aircraft'
-                  '\n3. Exit')
-            userInput = input()
-            if userInput == '1':
-                flying()
-            elif userInput == '2':
-                stateOfTheCraft()
-            elif userInput == '3':
-                exit()
+        if isOnSecondRound:
+            secondRound()
+            technicalIssue()
         else:
-            checkEngine()
             flying()
-            secondRound = True
+            technicalIssue()
+            isOnSecondRound = True
     elif not hasTakenOff:
         print('\nWhat do you want to do?'
               '\n1. Take off'
@@ -121,21 +135,6 @@ def whatToDo():
             stateOfTheCraft()
         else:
             exit()
-
-
-def checkEngine():
-    global leftEngineWorks
-    global rightEngineWorks
-    if chosenCraft.leftEngine.engineCondition <= 91:
-        print('Your left engine has encountered a critical failure and is no longer working.')
-        leftEngineWorks = False
-    elif chosenCraft.rightEngine.engineCondition <= 86:
-        print('Your right engine has encountered a critical failure and is no longer working.')
-        rightEngineWorks = False
-
-    if not leftEngineWorks and not rightEngineWorks:
-        print('Both your engines are out. You are going down.')
-        exit()
 
 
 leftEnoughFuel = True
@@ -162,20 +161,15 @@ def flying():
     global rightEnoughFuel
     global leftEngineOn
     global rightEngineOn
-    checkedEngine = False
     # Record the start time
     start_time = time.time()
     print('You are flying through the skies.')
     encounterWeather()
     elapsed_time = 0
     while elapsed_time < 5:
-        secondRound
         checkFuel()
         if leftEnoughFuel and rightEnoughFuel:
             # Reduces fuel + condition for every loop.
-            if checkedEngine:
-                checkEngine()
-                checkedEngine = True
             if leftEngineOn:
                 chosenCraft.leftEngine.engineCondition -= 2
                 chosenCraft.leftEngine.engineFuel -= elapsed_time * chosenCraft.leftEngine.calculateFuelBurnRate()
@@ -248,6 +242,10 @@ def fuelManagement():
 
 def technicalIssue():
     issues = ['landing gear malfunction', 'electrical system failure', 'navigation equipment issue']
-    current_issue = random.choice(issues)
-    print(f"Technical Issue: {current_issue}.")
+    if chosenCraft.leftEngine.engineCondition < 50:
+        current_issue = random.choice(issues)
+        print(f"Left engine has a technical Issue: {current_issue}.")
+    if chosenCraft.rightEngine.engineCondition < 50:
+        current_issue = random.choice(issues)
+        print(f"Right engine has a technical Issue: {current_issue}.")
     # Adjust the simulation based on the issue

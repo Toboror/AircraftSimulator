@@ -15,8 +15,9 @@ class EngineBlueprint:
 
 
 class AircraftBlueprint:
-    def __init__(self, leftEngineFuel, leftEngineCondition, leftEngineHP, rightEngineFuel, rightEngineCondition,
+    def __init__(self, name, leftEngineFuel, leftEngineCondition, leftEngineHP, rightEngineFuel, rightEngineCondition,
                  rightEngineHP):
+        self.name = name
         self.leftEngine = EngineBlueprint(leftEngineFuel, leftEngineCondition, leftEngineHP)
         self.rightEngine = EngineBlueprint(rightEngineFuel, rightEngineCondition, rightEngineHP)
 

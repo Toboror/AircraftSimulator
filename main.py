@@ -2,11 +2,14 @@ import aircraft
 import events
 
 # Creates different aircraft.
-spitfire = aircraft.AircraftBlueprint(3200, 100, 1000, 3200, 100, 1000)
-test = aircraft.AircraftBlueprint(10, 10, 10, 10, 10, 10)
+spitfire = aircraft.AircraftBlueprint('Spitfire', 3200, 100, 1000, 3200, 100, 1000)
+test = aircraft.AircraftBlueprint('Test', 10, 10, 10, 10, 10, 10)
+superConsumer = aircraft.AircraftBlueprint('SuperConsumer', 10000, 100, 2000, 10000, 100, 2000)
 
-# Var for setting the chosen aircraft. Default is test for testing purposes.
-chosenCraft = test
+aircraftList = [spitfire, test, superConsumer]
+
+# Var for setting the chosen aircraft. Default is spitfire.
+chosenCraft = spitfire
 
 
 # The frame stitching everything together.
