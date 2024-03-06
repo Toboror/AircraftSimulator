@@ -20,6 +20,14 @@ isFlying = False
 leftEngineBurnRate = chosenCraft.leftEngine.calculateFuelBurnRate()
 rightEngineBurnRate = chosenCraft.rightEngine.calculateFuelBurnRate()
 
+# Variables for if the aircraft is at city A or city B airport.
+atCityAAirport = False
+atCityBAirport = False
+
+# Variables for airport names.
+cityAAirport = 'City A Airport'
+cityBAirport = 'City B Airport'
+
 
 # Function for showing the state the aircraft is currently in. Engine fuel, condition, HP etc.
 def stateOfTheCraft():
@@ -42,21 +50,25 @@ def stateOfTheCraft():
           '\nTotal engine condition: ' + str(chosenCraft.totalCondition()) + '%')
 
 
-# Function for when the aircraft is taking off.
+# Function for when the aircraft is taking off. Also chooses where to fly. Default start airport is city A. Also runs
+# check on the engines to see if they work.
 def takeOff():
     global hasTakenOff
     global leftEngineOn
     global rightEngineOn
+    # Choose destination.
+    chooseDestination()
+
+    # Check if the engines work.
     print('Checking if everything works...')
     time.sleep(1)
-    if leftEngineWorks and rightEngineWorks:
-        print('Alright, taking off!')
-        hasTakenOff = True
-        leftEngineOn = True
-        rightEngineOn = True
-    elif not leftEngineWorks or not rightEngineWorks:
-        print('There seems to be a problem with one of the engines. We are not able to take off!')
-        exit()
+    print('Left engine...')
+    time.sleep(1)
+    print('Right engine...')
+    time.sleep(1)
+    print('Everything else...')
+    time.sleep(1)
+    print('Everything seems to be in order! Taking off...')
 
     time.sleep(1)
     print('-')
@@ -155,6 +167,8 @@ def checkFuel():
         rightEnoughFuel = False
 
 
+# Function for aircraft traveling. Changes based on the aircraft's condition, fuel, and weather. The function is modular
+# so that it may easily be expanded upon later when more events and aircraft are added. In addition to number changes.
 def flying():
     global hasTakenOff
     global leftEnoughFuel
@@ -235,11 +249,110 @@ def emergencySituation():
     # Require user input to address the emergency
 
 
+# Function for when the aircraft is running low on fuel and if there are other problems related to fuel. Only called
+# when fuel less than 10%.
 def fuelManagement():
-    print("Fuel is running low. Choose to divert to a closer airport or attempt to reach the planned destination.")
-    # User makes a choice affecting the outcome
+    if chosenCraft.leftEngine.engineFuel < chosenCraft.leftEngine.engineFuel * 0.1 \
+            and chosenCraft.rightEngine.engineFuel < chosenCraft.rightEngine.engineFuel * 0.1:
+        print("Fuel is running low. Choose to divert to a closer airport or attempt to reach the planned destination.")
+    # Require user input to address the fuel issue with different options.
+    userInput = input()
+    if userInput == '1':
+        print("The aircraft is diverting to a closer airport.")
+        # Will call a function for the event for diverting to a closer airport.
+        divertToCloserAirport()
+    elif userInput == '2':
+        print("The aircraft is attempting to reach the planned destination.")
+    else:
+        exit()
 
 
+# Function for refueling at a city airport. Will be expanded upon later.
+def refuelAtCityAirport():
+    global atCityAAirport
+    global atCityBAirport
+    if atCityAAirport:
+        print('Refuel at ' + cityAAirport + 'airport?"'
+          "\n1. Yes"
+          "\n2. No")
+    elif atCityBAirport:
+        print('Refuel at ' + cityBAirport + 'airport?"'
+          "\n1. Yes"
+          "\n2. No")
+    userInput = input()
+    if userInput == '1':
+        if atCityAAirport:
+            cityAFuelCosts()    # Will call the function for city A airport fuel costs.
+        elif atCityBAirport:
+            cityBFuelCosts()    # Will call the function for city B airport fuel costs.
+    elif userInput == '2':
+        if atCityAAirport:
+            print("The aircraft is not refueling at city A airport.")
+        elif atCityBAirport:
+            print("The aircraft is not refueling at city B airport.")
+    # Calls function for taking off again.
+    takeOff()
+
+# Function for city A airport fuel costs.
+def cityAFuelCosts():
+    print("The fuel costs at city A airport are 1.50€ per litre.")
+    # Require user input to choose to refuel or not.
+    userInput = input()
+    if userInput == '1':
+        print("The aircraft is refueling at city A airport.")
+        # Will call the function for refueling.
+    elif userInput == '2':
+        print("The aircraft is not refueling at city A airport.")
+        # Will call the function for not refueling.
+
+
+# Function for city B airport fuel costs.
+def cityBFuelCosts():
+    print("The fuel costs at city B airport are 1.60€ per litre.")
+    # Require user input to choose to refuel or not.
+    userInput = input()
+    if userInput == '1':
+        print("The aircraft is refueling at city B airport.")
+        # Will call the function for refueling.
+    elif userInput == '2':
+        print("The aircraft is not refueling at city B airport.")
+        # Will call the function for not refueling.
+
+# Function for choosing flight destination. Will be expanded upon later.
+def chooseDestination():
+    global atCityAAirport
+    global atCityBAirport
+    print("Choose a destination.")
+    # Require user input to choose a destination. Currently only able to travel to one destination. Checks where the
+    #  aircraft is currently located by using the variables for where it were last. Modular for future expansion.
+    userInput = input()
+    if atCityAAirport:
+        if userInput == '1':
+            print("The aircraft is flying to city B.")
+            # Will call the function for flying to city B.
+            atCityBAirport = True
+        else:
+            print("The aircraft is staying at city A.")
+            # Will call the function for flying to city A.
+            chooseDestination()
+    elif atCityBAirport:
+        if userInput == '1':
+            print("The aircraft is flying to city A.")
+            # Will call the function for flying to city A.
+            atCityAAirport = True
+        else:
+            print("The aircraft is staying at city B.")
+            chooseDestination()
+
+
+
+# Function for when the aircraft diverts to a closer airport.
+def divertToCloserAirport():
+    print("The aircraft has diverted to a closer airport.")
+    # Adjust the simulation based on the decision.
+
+
+# Function for when the aircraft encounters a technical issue.
 def technicalIssue():
     issues = ['landing gear malfunction', 'electrical system failure', 'navigation equipment issue']
     if chosenCraft.leftEngine.engineCondition < 50:
