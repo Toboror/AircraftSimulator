@@ -35,8 +35,18 @@ atCityBAirport = False
 cityAAirport = 'City A Airport'
 cityBAirport = 'City B Airport'
 
+# Variables for distances between cities in km.
+cityAtocityB = 1000
+
 # Variable if you have reached the destination.
 reachedDestination = False
+
+# Function for calculating travelling distance by using the aircraft horsepower and fuel consumption rate. Checks
+# which city you are currently in, and by using predefined variables for the distance between the cities, calculates
+# the distance to the destination.
+def calculateDistance(flightRoute):
+    travelTimeHours = flightRoute / chosenCraft.topSpeed
+    return travelTimeHours
 
 
 # Function for showing the state the aircraft is currently in. Engine fuel, condition, HP etc.
@@ -174,32 +184,23 @@ def whatToDo():
             stateOfTheCraft()
         else:
             exit()
-        # What to do if flying.
-    elif isFlying:
-        if elapsed_time >= 10:
-            print('You have reached your destination.')
-            reachedDestination = True
-        elif not elapsed_time >= 10:
-            print('\nWhat do you want to do?'
-                  '\n1. Continue flying'
-                  '\n2. Check aircraft'
-                  '\n3. Exit')
-        userInput = input()
-        if userInput == '1':
-            flying()
-        elif userInput == '2':
-            stateOfTheCraft()
-        elif userInput == '3':
-            exit()
 
-    # Check if the aircraft has reached the destination.
+
+
+# Function for if the aircraft has reached the destination. It calculates this by taking the distance between the cities
+# and the topspeed of the aircraft to find out how many hours it takes to travel the distance. Then it checks if the
+# aircraft is at the city airport and if it is, it will print that the aircraft has reached the destination and change
+# the variables for the airports.
+def reachedDestinationFunction():
+    global atCityAAirport
+    global atCityBAirport
     if reachedDestination:
         if atCityAAirport:
-            print('You have reached ' + cityBAirport + 'airport.')
+            print('You have reached ' + cityBAirport)
             atCityBAirport = True
             atCityAAirport = False
         elif atCityBAirport:
-            print('You have reached ' + cityAAirport + 'airport.')
+            print('You have reached ' + cityAAirport)
             atCityAAirport = True
             atCityBAirport = False
 
@@ -233,7 +234,7 @@ def flying():
     print('You are flying through the skies.')
     encounterWeather()
     hasTakenOff = True
-    while elapsed_time < 5:
+    while elapsed_time < calculateDistance(cityAtocityB):
         checkFuel()
         if leftEnoughFuel and rightEnoughFuel:
             # Reduces fuel + condition for every loop.
@@ -260,6 +261,12 @@ def flying():
         else:
             print('Both of your engines are out of fuel. You crash.')
             exit()
+
+    time.sleep(1)
+    reachedDestinationFunction()
+    reachedDestination = True
+    isFlying = False
+    time.sleep(1)
 
 
 def encounterWeather():
@@ -379,7 +386,7 @@ def chooseDestination():
     global atCityBAirport
     if atCityAAirport:
         print('Choose destination:'
-              '\n1. City B')
+              '\n1. City B - ' + str(calculateDistance(cityAtocityB)) + ' hours and ' + str(cityAtocityB) + ' km away')
     elif atCityBAirport:
         print('Choose destination:'
               '\n1. City A')
