@@ -13,6 +13,7 @@ class EngineBlueprint:
         fuel_burn_rate = (self.engineHP * condition_factor) / efficiency_constant
         return fuel_burn_rate
 
+
 class AircraftBlueprint:
     def __init__(self, name, leftEngineFuel, leftEngineCondition, leftEngineHP, rightEngineFuel, rightEngineCondition,
                  rightEngineHP):
@@ -30,4 +31,3 @@ class AircraftBlueprint:
         # Sum of overall condition of the aircraft
         total_condition = (self.leftEngine.engineCondition + self.rightEngine.engineCondition) / 2
         return total_condition
-

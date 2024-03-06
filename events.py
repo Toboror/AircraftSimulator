@@ -5,6 +5,13 @@ from main import aircraftList
 
 chosenCraft = main.chosenCraft
 
+# Var for checking if the aircraft has enough fuel.
+leftEnoughFuel = True
+rightEnoughFuel = True
+
+# Var for checking the elapsed time.
+elapsed_time = 0
+
 # Var for checking if the engines work
 leftEngineWorks = True
 rightEngineWorks = True
@@ -21,12 +28,15 @@ leftEngineBurnRate = chosenCraft.leftEngine.calculateFuelBurnRate()
 rightEngineBurnRate = chosenCraft.rightEngine.calculateFuelBurnRate()
 
 # Variables for if the aircraft is at city A or city B airport.
-atCityAAirport = False
+atCityAAirport = True
 atCityBAirport = False
 
 # Variables for airport names.
 cityAAirport = 'City A Airport'
 cityBAirport = 'City B Airport'
+
+# Variable if you have reached the destination.
+reachedDestination = False
 
 
 # Function for showing the state the aircraft is currently in. Engine fuel, condition, HP etc.
@@ -43,14 +53,16 @@ def stateOfTheCraft():
           '\nCondition: ' + str(chosenCraft.rightEngine.engineCondition) + '%',
           '\nHorsepower: ' + str(chosenCraft.rightEngine.engineHP),
           '\nFuel consumption rate: ' + str(chosenCraft.rightEngine.calculateFuelBurnRate()) + ' litres per hour'
-          '\n'
-          '\nTotal fuel amount: ' + str(chosenCraft.leftEngine.engineFuel + chosenCraft.rightEngine.engineFuel) +
+                                                                                               '\n'
+                                                                                               '\nTotal fuel amount: '
+          + str(
+              chosenCraft.leftEngine.engineFuel + chosenCraft.rightEngine.engineFuel) +
           ' litres',
           '\nTotal fuel consumption rate: ' + str(chosenCraft.totalFuelBurnRate()) + ' litres per hour',
           '\nTotal engine condition: ' + str(chosenCraft.totalCondition()) + '%')
 
 
-# Function for when the aircraft is taking off. Also chooses where to fly. Default start airport is city A. Also runs
+# Function for when the aircraft is taking off. Also choose where to fly. Default start airport is city A. Also runs
 # check on the engines to see if they work.
 def takeOff():
     global hasTakenOff
@@ -63,12 +75,15 @@ def takeOff():
     print('Checking if everything works...')
     time.sleep(1)
     print('Left engine...')
+    leftEngineOn = True
     time.sleep(1)
     print('Right engine...')
+    rightEngineOn = True
     time.sleep(1)
     print('Everything else...')
     time.sleep(1)
     print('Everything seems to be in order! Taking off...')
+    hasTakenOff = True
 
     time.sleep(1)
     print('-')
@@ -83,13 +98,16 @@ def takeOff():
     chosenCraft.rightEngine.engineCondition -= 5
 
 
+# Function for choosing aircraft. Should be modular so adding more aircraft is easy.
 def chooseAircraft():
     global chosenCraft
-    print('Which aircraft would you like?'
+    # List of aircraft. Should be based upon the aircraftList from main.py. Loop to make it modular.
+    print('Choose aircraft:'
           '\n1. ' + str(aircraftList[0].name),
           '\n2. ' + str(aircraftList[1].name),
           '\n3. ' + str(aircraftList[2].name),
-          '\n4. Exit')
+          '\n4. ' + str(aircraftList[3].name),
+          '\n5. Exit')
     userInput = input()
     if userInput == '1':
         chosenCraft = aircraftList[0]
@@ -100,6 +118,9 @@ def chooseAircraft():
     elif userInput == '3':
         chosenCraft = aircraftList[2]
         print('Your chosen aircraft is ' + str(aircraftList[2].name))
+    elif userInput == '4':
+        chosenCraft = aircraftList[3]
+        print('Your chosen aircraft is ' + str(aircraftList[3].name))
     else:
         exit()
 
@@ -108,22 +129,27 @@ isOnSecondRound = False
 
 
 def secondRound():
-        print('\nWhat do you want to do?'
-              '\n1. Continue flying'
-              '\n2. Check aircraft'
-              '\n3. Exit')
-        userInput = input()
-        if userInput == '1':
-            flying()
-        elif userInput == '2':
-            stateOfTheCraft()
-        elif userInput == '3':
-            exit()
+    print('\nWhat do you want to do?'
+          '\n1. Continue flying'
+          '\n2. Check aircraft'
+          '\n3. Exit')
+    userInput = input()
+    if userInput == '1':
+        flying()
+    elif userInput == '2':
+        stateOfTheCraft()
+    elif userInput == '3':
+        exit()
 
 
 # Function asking the user what to do next.
 def whatToDo():
     global isOnSecondRound
+    global isFlying
+    global reachedDestination
+    global atCityAAirport
+    global atCityBAirport
+    global elapsed_time
     if hasTakenOff:
         if isOnSecondRound:
             secondRound()
@@ -133,6 +159,7 @@ def whatToDo():
             technicalIssue()
             isOnSecondRound = True
     elif not hasTakenOff:
+        # What to do if not flying.
         print('\nWhat do you want to do?'
               '\n1. Take off'
               '\n2. Choose aircraft'
@@ -147,10 +174,34 @@ def whatToDo():
             stateOfTheCraft()
         else:
             exit()
+        # What to do if flying.
+    elif isFlying:
+        if elapsed_time >= 10:
+            print('You have reached your destination.')
+            reachedDestination = True
+        elif not elapsed_time >= 10:
+            print('\nWhat do you want to do?'
+                  '\n1. Continue flying'
+                  '\n2. Check aircraft'
+                  '\n3. Exit')
+        userInput = input()
+        if userInput == '1':
+            flying()
+        elif userInput == '2':
+            stateOfTheCraft()
+        elif userInput == '3':
+            exit()
 
-
-leftEnoughFuel = True
-rightEnoughFuel = True
+    # Check if the aircraft has reached the destination.
+    if reachedDestination:
+        if atCityAAirport:
+            print('You have reached ' + cityBAirport + 'airport.')
+            atCityBAirport = True
+            atCityAAirport = False
+        elif atCityBAirport:
+            print('You have reached ' + cityAAirport + 'airport.')
+            atCityAAirport = True
+            atCityBAirport = False
 
 
 def checkFuel():
@@ -175,11 +226,13 @@ def flying():
     global rightEnoughFuel
     global leftEngineOn
     global rightEngineOn
+    global reachedDestination
+    global elapsed_time
     # Record the start time
     start_time = time.time()
     print('You are flying through the skies.')
     encounterWeather()
-    elapsed_time = 0
+    hasTakenOff = True
     while elapsed_time < 5:
         checkFuel()
         if leftEnoughFuel and rightEnoughFuel:
@@ -273,18 +326,18 @@ def refuelAtCityAirport():
     global atCityBAirport
     if atCityAAirport:
         print('Refuel at ' + cityAAirport + 'airport?"'
-          "\n1. Yes"
-          "\n2. No")
+                                            "\n1. Yes"
+                                            "\n2. No")
     elif atCityBAirport:
         print('Refuel at ' + cityBAirport + 'airport?"'
-          "\n1. Yes"
-          "\n2. No")
+                                            "\n1. Yes"
+                                            "\n2. No")
     userInput = input()
     if userInput == '1':
         if atCityAAirport:
-            cityAFuelCosts()    # Will call the function for city A airport fuel costs.
+            cityAFuelCosts()  # Will call the function for city A airport fuel costs.
         elif atCityBAirport:
-            cityBFuelCosts()    # Will call the function for city B airport fuel costs.
+            cityBFuelCosts()  # Will call the function for city B airport fuel costs.
     elif userInput == '2':
         if atCityAAirport:
             print("The aircraft is not refueling at city A airport.")
@@ -292,6 +345,7 @@ def refuelAtCityAirport():
             print("The aircraft is not refueling at city B airport.")
     # Calls function for taking off again.
     takeOff()
+
 
 # Function for city A airport fuel costs.
 def cityAFuelCosts():
@@ -318,11 +372,17 @@ def cityBFuelCosts():
         print("The aircraft is not refueling at city B airport.")
         # Will call the function for not refueling.
 
+
 # Function for choosing flight destination. Will be expanded upon later.
 def chooseDestination():
     global atCityAAirport
     global atCityBAirport
-    print("Choose a destination.")
+    if atCityAAirport:
+        print('Choose destination:'
+              '\n1. City B')
+    elif atCityBAirport:
+        print('Choose destination:'
+              '\n1. City A')
     # Require user input to choose a destination. Currently only able to travel to one destination. Checks where the
     #  aircraft is currently located by using the variables for where it were last. Modular for future expansion.
     userInput = input()
@@ -343,7 +403,6 @@ def chooseDestination():
         else:
             print("The aircraft is staying at city B.")
             chooseDestination()
-
 
 
 # Function for when the aircraft diverts to a closer airport.

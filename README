@@ -2,6 +2,9 @@
 Version 1.02:
     - Added City A and City B.
     - Added flying to destination.
+    - Added SuperSpeed aircraft.
+
+    - Fixed bug where two engine failure messages appear for the same engine.
 
 02/05/24
 Version 1.01:
