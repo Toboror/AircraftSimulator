@@ -33,3 +33,25 @@ class AircraftBlueprint:
         # Sum of overall condition of the aircraft
         total_condition = (self.leftEngine.engineCondition + self.rightEngine.engineCondition) / 2
         return total_condition
+
+
+# Global variables for the simulation
+aircraftList = [
+    AircraftBlueprint('Spitfire', 3200, 100, 1000, 3200, 100, 1000, 1000),
+    AircraftBlueprint('Test', 10, 10, 10, 10, 10, 10, 10),
+    AircraftBlueprint('SuperConsumer', 10000, 100, 2000, 10000, 100, 2000, 2000),
+    AircraftBlueprint('SuperSpeed', 3200, 100, 10000, 3200, 100, 10000, 10000)
+]
+
+# Creates different aircraft.
+spitfire = AircraftBlueprint('Spitfire', 594, 3200, 100, 1000, 3200, 100, 1000)
+test = AircraftBlueprint('Test', 300, 10, 10, 10, 10, 10, 10)
+
+# This is a super consumer aircraft. It's fuel burn rate is 10 times higher than the Spitfire.
+superConsumer = AircraftBlueprint('SuperConsumer', 300, 10000, 100, 2000, 10000, 100, 2000)
+
+# SuperSpeed is a super-fast aircraft. Its HP is 10 times higher than the Spitfire.
+superSpeed = AircraftBlueprint('SuperSpeed', 300, 3200, 100, 10000, 3200, 100, 10000)
+
+# Var for setting the chosen aircraft. Default is spitfire.
+chosenCraft = spitfire

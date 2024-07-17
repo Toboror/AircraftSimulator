@@ -2,7 +2,7 @@ import random
 import time
 import pygame
 
-from main import aircraftList, chosenCraft
+from aircraft import aircraftList, chosenCraft
 
 # Global variables for the simulation
 leftEnoughFuel = True
@@ -18,6 +18,7 @@ atCityAAirport = True
 atCityBAirport = False
 reachedDestination = False
 hasChosenAircraft = False
+isOnSecondRound = False
 
 cityAAirport = 'City A Airport'
 cityBAirport = 'City B Airport'
@@ -50,28 +51,52 @@ def stateOfTheCraft(text_box):
 
 
 def takeOff(gui_elements):
+    global hasTakenOff, leftEngineOn, rightEngineOn, takeOffStartTime, takeOffStep
     label, buttons, text_box = gui_elements  # Unpack correctly
-    global hasTakenOff, leftEngineOn, rightEngineOn
-    append_to_text_box(text_box, 'Checking if everything works...')
-    time.sleep(1)
-    append_to_text_box(text_box, 'Left engine...')
-    leftEngineOn = True
-    time.sleep(1)
-    append_to_text_box(text_box, 'Right engine...')
-    rightEngineOn = True
-    time.sleep(1)
-    append_to_text_box(text_box, 'Everything else...')
-    time.sleep(1)
-    append_to_text_box(text_box, 'Everything seems to be in order! Taking off...')
-    hasTakenOff = True
+
+    # Initialize the takeoff process if it hasn't started yet
+    if not hasTakenOff:
+        takeOffStartTime = pygame.time.get_ticks()  # Step 2: Record the start time
+        takeOffStep = 0  # Initialize or reset the takeoff step counter
+        hasTakenOff = True  # Mark the takeoff process as started
+
+    # Calculate the elapsed time since the start of the takeoff process
+    currentTime = pygame.time.get_ticks()  # Step 3: Get the current time
+    elapsedTime = currentTime - takeOffStartTime  # Calculate the elapsed time
+
+    # Step 4: Proceed through the takeoff steps based on the elapsed time
+    if takeOffStep == 0 and elapsedTime >= 1000:  # After 1 second, check the left engine
+        append_to_text_box(text_box, 'Checking if everything works...')
+        takeOffStep += 1
+        takeOffStartTime = currentTime  # Reset the start time for the next step
+    if takeOffStep == 1 and elapsedTime >= 1000:  # After another second, check the right engine
+        append_to_text_box(text_box, 'Left engine...')
+        leftEngineOn = True
+        takeOffStep += 1
+        takeOffStartTime = currentTime
+    if takeOffStep == 2 and elapsedTime >= 1000:  # After another second, finalize checks
+        append_to_text_box(text_box, 'Right engine...')
+        rightEngineOn = True
+        takeOffStep += 1
+        takeOffStartTime = currentTime
+    if takeOffStep == 3 and elapsedTime >= 1000:  # After another second, take off
+        append_to_text_box(text_box, 'Everything else...')
+        takeOffStep += 1
+        takeOffStartTime = currentTime
+    if takeOffStep == 4 and elapsedTime >= 1000:  # Confirm takeoff
+        append_to_text_box(text_box, 'Everything seems to be in order! Taking off...')
+        takeOffStep += 1  # This marks the end of the takeoff process
+
+    # Additional steps can be added here following the same pattern
 
 
 def chooseAircraft(text_box):
     global hasChosenAircraft
-    return append_to_text_box(text_box, 'test')
+    return append_to_text_box(text_box, 0)
+
 
 def secondRound():
-    return ('')
+    return ''
 
 
 def checkFuel():
