@@ -17,7 +17,6 @@ Optimization:
 Known bugs:
     - Game almost crashes if you are on your "second round". Meaning if you start the game, go out, and start it again,
     the game hangs for several seconds.
-    - Player can not move to the rightmost part of the screen.
     - Buttons does not realign correctly after toggling to fullscreen mode.
 
 14/07/24
